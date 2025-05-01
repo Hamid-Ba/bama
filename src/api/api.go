@@ -1,11 +1,16 @@
 package api
 
 import (
+	"fmt"
+
 	"github.com/Hamid-Ba/bama/api/routers"
+	"github.com/Hamid-Ba/bama/config"
 	"github.com/gin-gonic/gin"
 )
 
 func InitServer() {
+	cfg := config.GetConfig()
+
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery())
 
@@ -15,6 +20,6 @@ func InitServer() {
 		routers.Health(health)
 	}
 
-	r.Run(":5005")
+	r.Run(fmt.Sprintf(":%s", cfg.Server.ExternalPort))
 
 }
