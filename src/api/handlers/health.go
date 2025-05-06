@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/Hamid-Ba/bama/api/helpers"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,5 +14,5 @@ func NewHealthHandler() *HealthHandler {
 }
 
 func (health *HealthHandler) Health(c *gin.Context) {
-	c.JSON(http.StatusOK, "Working Fine!")
+	c.JSON(http.StatusOK, helpers.GenerateBaseResponse("Working Fine", true, 0))
 }
