@@ -12,24 +12,31 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func InitServer() {
-	cfg := config.GetConfig()
-
+func InitServer(cfg *config.Config) {
 	r := gin.New()
 
-	val, _ := binding.Validator.Engine().(*validator.Validate)
-
-	val.RegisterValidation("password", validators.CheckPassword, true)
+	RegisterValidator()
 
 	r.Use(middlewares.Cors(cfg))
 	r.Use(gin.Logger(), gin.Recovery(), middlewares.LimitterMiddleware())
 
+	RegisterRouter(r)
+
+	r.Run(fmt.Sprintf(":%s", cfg.Server.ExternalPort))
+
+}
+
+func RegisterRouter(r *gin.Engine) {
 	v1 := r.Group("/api/v1/")
 	{
 		health := v1.Group("/health")
 		routers.Health(health)
 	}
+}
 
-	r.Run(fmt.Sprintf(":%s", cfg.Server.ExternalPort))
+func RegisterValidator() {
+	val, _ := binding.Validator.Engine().(*validator.Validate)
 
+	// Register custom validators here
+	val.RegisterValidation("password", validators.CheckPassword, true)
 }
