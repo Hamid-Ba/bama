@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Hamid-Ba/bama/config"
+	"github.com/Hamid-Ba/bama/pkg/logging"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -29,15 +30,19 @@ func InitRedisClient(cfg *config.Config) {
 
 	_, err := client.Ping(ctx).Result()
 	if err != nil {
+		logging.Log.Error("Failed to connect to Redis", logging.Field{Key: "error", Value: err})
 		panic("Failed to connect to Redis: " + err.Error())
 	}
 
+	logging.Log.Info("PING Redis: " + cfg.Redis.Host + ":" + cfg.Redis.Port)
 	println("PING Redis: " + cfg.Redis.Host + ":" + cfg.Redis.Port)
+	logging.Log.Info("Redis client initialized successfully")
 	println("Redis client initialized successfully")
 }
 
 func GetRedisClient() *redis.Client {
 	if client == nil {
+		logging.Log.Error("Redis client is not initialized. Please call SetRedisClient first.")
 		panic("Redis client is not initialized. Please call SetRedisClient first.")
 	}
 	return client
@@ -47,6 +52,7 @@ func CloseRedisClient() {
 	if client != nil {
 		err := client.Close()
 		if err != nil {
+			logging.Log.Error("Failed to close Redis client: " + err.Error())
 			panic("Failed to close Redis client: " + err.Error())
 		}
 		client = nil

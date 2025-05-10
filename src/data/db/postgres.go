@@ -2,10 +2,10 @@ package db
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/Hamid-Ba/bama/config"
+	"github.com/Hamid-Ba/bama/pkg/logging"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -20,12 +20,14 @@ func InitDb(cfg *config.Config) error {
 
 	dbClient, err = gorm.Open(postgres.Open(cnn), &gorm.Config{})
 	if err != nil {
+		logging.Log.Error(err.Error())
 		return err
 	}
 
 	sqlDb, _ := dbClient.DB()
 	err = sqlDb.Ping()
 	if err != nil {
+		logging.Log.Error(err.Error())
 		return err
 	}
 
@@ -33,7 +35,7 @@ func InitDb(cfg *config.Config) error {
 	sqlDb.SetMaxOpenConns(cfg.Postgres.MaxOpenConns)
 	sqlDb.SetConnMaxLifetime(cfg.Postgres.ConnMaxLifetime * time.Minute)
 
-	log.Println("Db connection established")
+	logging.Log.Info("Db connection established")
 	return nil
 }
 
