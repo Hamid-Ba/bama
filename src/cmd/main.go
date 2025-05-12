@@ -6,8 +6,8 @@ import (
 
 	"github.com/Hamid-Ba/bama/api"
 	"github.com/Hamid-Ba/bama/config"
-	"github.com/Hamid-Ba/bama/data/cache"
-	"github.com/Hamid-Ba/bama/data/db"
+	"github.com/Hamid-Ba/bama/infrastructure/cache"
+	"github.com/Hamid-Ba/bama/infrastructure/db"
 	"github.com/Hamid-Ba/bama/pkg/logging"
 )
 
