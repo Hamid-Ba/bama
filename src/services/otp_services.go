@@ -45,3 +45,26 @@ func (otp_service *OTPSerivce) SetOTP(phone string, otp string) error {
 	}
 	return nil
 }
+
+func (otp_service *OTPSerivce) ValidateOTP(phone string, otp string) error {
+	key := fmt.Sprintf("%s:%s", "OTP", phone)
+
+	res, err := cache.Get[OTPDTO](otp_service.redisClient, key)
+
+	if err != nil {
+		return err
+	} else if res.IsUsed {
+		return fmt.Errorf("OTP USED")
+	} else if !res.IsUsed && res.Password != otp {
+		return fmt.Errorf("OTP IS WRONG")
+	} else if !res.IsUsed && res.Password == otp {
+		res.IsUsed = true
+		err := cache.Set(otp_service.redisClient, key, res, otp_service.cfg.Otp.ExpireTime*time.Second)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
