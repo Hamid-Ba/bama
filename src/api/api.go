@@ -21,17 +21,20 @@ func InitServer(cfg *config.Config) {
 	r.Use(middlewares.Cors(cfg))
 	r.Use(gin.Logger(), gin.Recovery(), middlewares.LimitterMiddleware())
 
-	RegisterRouter(r)
+	RegisterRouter(r, cfg)
 
 	r.Run(fmt.Sprintf(":%s", cfg.Server.ExternalPort))
 
 }
 
-func RegisterRouter(r *gin.Engine) {
+func RegisterRouter(r *gin.Engine, cfg *config.Config) {
 	v1 := r.Group("/api/v1/")
 	{
 		health := v1.Group("/health")
 		routers.Health(health)
+
+		user := v1.Group("/user")
+		routers.UserRouter(user, cfg)
 	}
 }
 
