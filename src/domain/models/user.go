@@ -4,7 +4,6 @@ type User struct {
 	BaseModel
 	Phone     string `gorm:"type:string;size:11;not null,unique;"`
 	Fullname  string `gorm:"type:string;size:32;null"`
-	Password  string `gorm:"type:string;size:64;not null"`
 	UserRoles []UserRole
 }
 

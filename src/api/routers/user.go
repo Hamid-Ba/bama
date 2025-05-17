@@ -11,5 +11,6 @@ func UserRouter(r *gin.RouterGroup, cfg *config.Config) {
 
 	handler := handlers.NewUserHandler(cfg)
 
-	r.POST("/send-otp", middlewares.OTPLimiter(cfg),handler.SendOTP)
+	r.POST("/send-otp", middlewares.OTPLimiter(cfg), handler.SendOTP)
+	r.POST("/LoginOrRegister", middlewares.OTPLimiter(cfg), handler.LoginOrRegister)
 }

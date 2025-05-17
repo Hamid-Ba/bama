@@ -9,7 +9,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type OTPSerivce struct {
+type OTPService struct {
 	cfg         *config.Config
 	redisClient *redis.Client
 }
@@ -19,14 +19,14 @@ type OTPDTO struct {
 	IsUsed   bool
 }
 
-func NewOTPService(cfg *config.Config) *OTPSerivce {
-	return &OTPSerivce{
+func NewOTPService(cfg *config.Config) *OTPService {
+	return &OTPService{
 		cfg:         cfg,
 		redisClient: cache.GetRedisClient(),
 	}
 }
 
-func (otp_service *OTPSerivce) SetOTP(phone string, otp string) error {
+func (otp_service *OTPService) SetOTP(phone string, otp string) error {
 	otp_dto := &OTPDTO{
 		Password: otp,
 		IsUsed:   false,
@@ -46,7 +46,7 @@ func (otp_service *OTPSerivce) SetOTP(phone string, otp string) error {
 	return nil
 }
 
-func (otp_service *OTPSerivce) ValidateOTP(phone string, otp string) error {
+func (otp_service *OTPService) ValidateOTP(phone string, otp string) error {
 	key := fmt.Sprintf("%s:%s", "OTP", phone)
 
 	res, err := cache.Get[OTPDTO](otp_service.redisClient, key)
