@@ -53,3 +53,33 @@ func AuthenticationMiddleware(cfg *config.Config) gin.HandlerFunc {
 	}
 }
 
+func AuthorizationMiddleware(role_names []string) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		if len(ctx.Keys) == 0 {
+			ctx.AbortWithStatusJSON(http.StatusForbidden, helpers.GenerateBaseResponse(nil, false, -2))
+			return
+		}
+		rolesVal := ctx.Keys[constants.RolesKey]
+		if rolesVal == nil {
+			ctx.AbortWithStatusJSON(http.StatusForbidden, helpers.GenerateBaseResponse(nil, false, -2))
+			return
+		}
+
+		roles := rolesVal.([]interface{})
+
+		val := map[string]int{}
+
+		for _, item := range roles {
+			val[item.(string)] = 0
+		}
+
+		for _, role := range role_names {
+			if _, ok := val[role]; ok {
+				ctx.Next()
+				return
+			}
+		}
+
+		ctx.AbortWithStatusJSON(http.StatusForbidden, helpers.GenerateBaseResponse(nil, false, -2))
+	}
+}
