@@ -19,7 +19,7 @@ func InitServer(cfg *config.Config) {
 
 	r.Use(middlewares.DefaultStructuredLogger(cfg))
 	r.Use(middlewares.Cors(cfg))
-	r.Use(gin.Logger(), gin.Recovery(), middlewares.LimitterMiddleware())
+	r.Use(gin.Logger(), gin.CustomRecovery(middlewares.ErrorHandler), middlewares.LimitterMiddleware())
 
 	RegisterRouter(r, cfg)
 

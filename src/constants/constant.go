@@ -14,4 +14,7 @@ const (
 	MobileNumberKey        string = "MobileNumber"
 	RolesKey               string = "Roles"
 	ExpireTimeKey          string = "Exp"
+
+	// Headers
+	AuthenticationHeader string = "Authorization"
 )
