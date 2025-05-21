@@ -69,7 +69,7 @@ func (token_service *TokenService) VerifyToken(token string) (*jwt.Token, error)
 	at, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
-			return nil, fmt.Errorf("UnExpected Error!")
+			return nil, fmt.Errorf("UNEXPECTED ERROR")
 		}
 		return []byte(token_service.cfg.JWT.Secret), nil
 	})
@@ -93,5 +93,5 @@ func (token_service *TokenService) GetClaims(token string) (claimMap map[string]
 		}
 		return claimMap, nil
 	}
-	return nil, fmt.Errorf("Claims Not Found")
+	return nil, fmt.Errorf("CLAIMS NOT FOUND")
 }
