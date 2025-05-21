@@ -7,6 +7,7 @@ import (
 	"github.com/Hamid-Ba/bama/api/dtos"
 	"github.com/Hamid-Ba/bama/domain/models"
 	"github.com/Hamid-Ba/bama/infrastructure/db"
+	"github.com/Hamid-Ba/bama/pkg/logging"
 	"gorm.io/gorm"
 )
 
@@ -47,6 +48,8 @@ func (country_service *CountryService) Create(create_dto dtos.CreateUpdateCountr
 
 	country.BeforeCreate()
 	if err := tx.Create(country).Error; err != nil {
+		tx.Rollback()
+		logging.Log.Error(err.Error())
 		return nil, err
 	}
 
@@ -63,6 +66,8 @@ func (country_service *CountryService) Update(id int, update_dto dtos.CreateUpda
 
 	tx := country_service.db.Statement.Begin()
 	if err := tx.Model(models.Country{}).Where("id = ?", id).Updates(updated_field).Error; err != nil {
+		tx.Rollback()
+		logging.Log.Error(err.Error())
 		return nil, err
 	}
 	tx.Commit()
@@ -74,6 +79,8 @@ func (country_service *CountryService) Delete(id int) error {
 	tx := country_service.db.Statement.Begin()
 
 	if err := tx.Model(models.Country{}).Where("id = ?", id).Update("IsActive", false).Error; err != nil {
+		tx.Rollback()
+		logging.Log.Error(err.Error())
 		return err
 	}
 
