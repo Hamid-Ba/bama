@@ -23,7 +23,7 @@ func (country_service *CountryService) GetBy(id int) (*dtos.CountryResponseDTO, 
 }
 
 func (country_service *CountryService) GetList() (*[]dtos.CountryResponseDTO, error) {
-	res, err := country_service.GetList()
+	res, err := country_service.repo.GetList()
 
 	return res, err
 }
