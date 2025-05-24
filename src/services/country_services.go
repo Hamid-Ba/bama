@@ -1,90 +1,46 @@
 package services
 
 import (
-	"database/sql"
-	"time"
-
 	"github.com/Hamid-Ba/bama/api/dtos"
 	"github.com/Hamid-Ba/bama/domain/models"
 	"github.com/Hamid-Ba/bama/infrastructure/db"
-	"github.com/Hamid-Ba/bama/pkg/logging"
-	"gorm.io/gorm"
 )
 
 type CountryService struct {
-	db *gorm.DB
+	repo *RepositroyService[models.Country, dtos.CreateUpdateCountryDTO, dtos.CreateUpdateCountryDTO, dtos.CountryResponseDTO]
 }
 
 func NewCountryService() *CountryService {
-	return &CountryService{db: db.GetDb()}
+	return &CountryService{repo: &RepositroyService[models.Country, dtos.CreateUpdateCountryDTO, dtos.CreateUpdateCountryDTO, dtos.CountryResponseDTO]{
+		db: db.GetDb(),
+	}}
 }
 
 func (country_service *CountryService) GetBy(id int) (*dtos.CountryResponseDTO, error) {
-	res := new(dtos.CountryResponseDTO)
+	res, err := country_service.repo.GetBy(id)
 
-	if err := country_service.db.Model(models.Country{}).Where("id = ? AND IsActive = ?", id, true).First(&res).Error; err != nil {
-		return nil, err
-	}
-
-	return res, nil
+	return &res, err
 }
 
 func (country_service *CountryService) GetList() (*[]dtos.CountryResponseDTO, error) {
-	res := new([]dtos.CountryResponseDTO)
+	res, err := country_service.GetList()
 
-	if err := country_service.db.Model(models.Country{}).Where("IsActive = ?", true).Find(&res).Error; err != nil {
-		return nil, err
-	}
-
-	return res, nil
+	return res, err
 }
 
 func (country_service *CountryService) Create(create_dto dtos.CreateUpdateCountryDTO) (*dtos.CountryResponseDTO, error) {
-	country := &models.Country{
-		Name: create_dto.Name,
-	}
+	res, err := country_service.repo.Create(create_dto)
 
-	tx := country_service.db.Statement.Begin()
-
-	country.BeforeCreate()
-	if err := tx.Create(country).Error; err != nil {
-		tx.Rollback()
-		logging.Log.Error(err.Error())
-		return nil, err
-	}
-
-	tx.Commit()
-
-	return country_service.GetBy(country.Id)
+	return &res, err
 }
 
 func (country_service *CountryService) Update(id int, update_dto dtos.CreateUpdateCountryDTO) (*dtos.CountryResponseDTO, error) {
-	updated_field := map[string]interface{}{
-		"Name":       update_dto.Name,
-		"Updated_at": sql.NullTime{Time: time.Now().UTC(), Valid: true},
-	}
+	res, err := country_service.repo.Update(id, update_dto)
 
-	tx := country_service.db.Statement.Begin()
-	if err := tx.Model(models.Country{}).Where("id = ?", id).Updates(updated_field).Error; err != nil {
-		tx.Rollback()
-		logging.Log.Error(err.Error())
-		return nil, err
-	}
-	tx.Commit()
-
-	return country_service.GetBy(id)
+	return &res, err
 }
 
 func (country_service *CountryService) Delete(id int) error {
-	tx := country_service.db.Statement.Begin()
-
-	if err := tx.Model(models.Country{}).Where("id = ?", id).Update("IsActive", false).Error; err != nil {
-		tx.Rollback()
-		logging.Log.Error(err.Error())
-		return err
-	}
-
-	tx.Commit()
-
-	return nil
+	err := country_service.repo.Delete(id)
+	return err
 }
